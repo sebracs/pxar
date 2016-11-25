@@ -55,7 +55,8 @@ int main(int argc, char *argv[])
     doUpdateFlash(false),
     doUpdateRootFile(false),
     doUseRootLogon(false),
-	doSetTrigger(false);
+	doSetTrigger(false),
+	doUseExtClock(false);
     
   for (int i = 0; i < argc; i++)
   {
@@ -74,7 +75,8 @@ int main(int argc, char *argv[])
       cout << "-y YY                 y position for GUI placement" << endl;
       cout << "-v verbositylevel     set verbosity level: QUIET CRITICAL ERROR WARNING DEBUG DEBUGAPI DEBUGHAL ..." << endl;
       cout << "-L logID              add additional <logID> to log output after the timestamp. ex: pxar -L TB1" << endl;
-      cout << "--trig trigger		 set the trigger according to docu" << endl;
+      cout << "--trig trigger		select the trigger source to be used for the DAQ session" << endl;
+      cout << "--extclock			enables the external DTB clock input, switches off the internal clock" << endl;
       return 0;
     }
     
@@ -90,6 +92,7 @@ int main(int argc, char *argv[])
     if (!strcmp(argv[i],"-v"))                                {verbosity  = string(argv[++i]); }
     if (!strcmp(argv[i],"-L"))                                {Log::logName(string(argv[++i]));}
     if (!strcmp(argv[i],"--trig"))						  	  {trigger_source = string(argv[++i]); doSetTrigger = true;}
+    if (!strcmp(argv[i],"--extclock"))						  {doUseExtClock = true;}
   }
 
   struct stat buffer;
@@ -269,10 +272,17 @@ int main(int argc, char *argv[])
   {
     LOG(logDEBUG) << "Initial Module Temperature: " << Form("%3.1f", a.getPixMonitor()->getTemp()) << " C";
   }
+
   if(doSetTrigger)
   {
-	  LOG(logINFO) << "Set Trigger_Source to: " << trigger_source;
-	  api->daqTriggerSource(trigger_source);
+    LOG(logINFO) << "Set Trigger_Source to: " << trigger_source;
+	api->daqTriggerSource(trigger_source);
+  }
+
+  if(doUseExtClock)
+  {
+	LOG(logINFO) << "Using external clock input";
+	api->setExternalClock(true);
   }
 
   if (doRunGui)
