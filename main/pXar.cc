@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
   }
   if(doSetTrigger)
   {
-	  LOG(logDEBUG) << "Set Trigger_Source to: " << trigger_source << endl;
+	  LOG(logINFO) << "Set Trigger_Source to: " << trigger_source;
 	  api->daqTriggerSource(trigger_source);
   }
 
